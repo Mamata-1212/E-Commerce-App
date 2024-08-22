@@ -19,12 +19,13 @@ export interface Product {
 
 export interface User {
   id?: number;
-  firstname?: string; 
-  lastname?: string; 
+  name?:{
+    firstname?: string; 
+    lastname?: string; 
+  }
   email?: string;
   username?:string;
   password?: string;
-  name?:object;
   address?: object;
   phone?:string
 }
