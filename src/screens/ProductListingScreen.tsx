@@ -1,56 +1,86 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, Text } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/store';
-import { fetchProducts } from '../utils/api';
-import SearchBar from '../components/SearchBar';
-import Select from '../components/Select';
-import Button from '../components/Button';
-import { filterProducts, setProducts } from '../redux/slices/productSlice';
-import { Picker } from '@react-native-picker/picker';
+import React, {useEffect, useState} from 'react';
+import {View, FlatList, StyleSheet, Button, Text} from 'react-native';
+import {Product} from '../types';
+import {
+  fetchCategories,
+  fetchProducts,
+  fetchProductsByCategory,
+} from '../utils/api';
+import ProductItem from '../components/ProductItem';
+import FilterModal from '../components/FilterModal';
+import {showError} from '../utils/helper';
 
-const ProductListScreen: React.FC = () => {
-  const dispatch = useDispatch();
-  const { filteredItems } = useSelector((state: RootState) => state.products);
-  const [category, setCategory] = useState('All');
-  const [minPrice, setMinPrice] = useState(0);
-  const [maxPrice, setMaxPrice] = useState(1000);
+const ProductsScreen: React.FC<{navigation: any}> = ({navigation}) => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isFilterModalVisible, setFilterModalVisible] = useState(false);
+  const [sort, setSort] = useState<string>('');
+  const [limit, setLimit] = useState<string>('10');
+
+  const fetchProductData = async () => {
+    try {
+      const response = selectedCategory
+        ? await fetchProductsByCategory(selectedCategory)
+        : await fetchProducts(Number(limit),sort);
+      setProducts(response);
+    } catch (error) {
+      showError(error);
+    }
+  };
 
   useEffect(() => {
-    const getProducts = async () => {
-      const response = await fetchProducts();
-      dispatch(setProducts(response.data));
+    fetchProductData();
+  }, [selectedCategory, sort, limit]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetchCategories();
+        setCategories(response);
+      } catch (error) {
+        showError(error);
+      }
     };
-    getProducts();
-  }, [dispatch]);
+    loadCategories();
+  }, []);
 
-  useEffect(() => {
-    dispatch(filterProducts({ category, minPrice, maxPrice }));
-  }, [category, minPrice, maxPrice, dispatch]);
+  const handleCategorySelect = (category: string) => {
+    setSelectedCategory(category);
+  };
+
+  const handleSortChange = (sortOption: string) => {
+    setSort(sortOption);
+  };
+
+  const handleLimitChange = (limitOption: string) => {
+    setLimit(limitOption);
+  };
+
+  const handleProductPress = (productId: number) => {
+    navigation.navigate('ProductDetails', {productId});
+  };
+
+  const renderItem = ({item}: {item: Product}) => (
+    <ProductItem product={item} onPress={() => handleProductPress(item.id)} />
+  );
 
   return (
     <View style={styles.container}>
-      <SearchBar placeholder="Search products..." />
-      <Select
-        selectedValue={category}
-        onValueChange={(itemValue) => setCategory(itemValue.toString())}
-      >
-        <Picker.Item label="All" value="All" />
-        <Picker.Item label="Electronics" value="Electronics" />
-        <Picker.Item label="Jewelery" value="Jewelery" />
-        <Picker.Item label="Men's Clothing" value="Men's Clothing" />
-        <Picker.Item label="Women's Clothing" value="Women's Clothing" />
-      </Select>
-      {/* <Button onPress={() => setMinPrice(0) && setMaxPrice(1000)} title="Reset Filters" /> */}
+      <Button title="Filter" onPress={() => setFilterModalVisible(true)} />
       <FlatList
-        data={filteredItems}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.product}>
-            <Text>{item.title}</Text>
-            <Text>${item.price}</Text>
-          </View>
-        )}
+        data={products}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
+        ListEmptyComponent={<Text>No products found</Text>}
+      />
+      <FilterModal
+        visible={isFilterModalVisible}
+        categories={categories}
+        onCategorySelect={handleCategorySelect}
+        onLimitChange={handleLimitChange}
+        onSortChange={handleSortChange}
+        onClose={() => setFilterModalVisible(false)}
       />
     </View>
   );
@@ -58,14 +88,9 @@ const ProductListScreen: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
-  },
-  product: {
     padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
   },
 });
 
-export default ProductListScreen;
+export default ProductsScreen;
