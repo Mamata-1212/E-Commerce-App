@@ -6,9 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-  Button,
 } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
+import Button from './Button';
 
 interface FilterModalProps {
   visible: boolean;
@@ -82,9 +82,10 @@ const FilterModal: React.FC<FilterModalProps> = ({
             <Picker.Item label="10 per page" value="10" />
             <Picker.Item label="50 per page" value="50" />
           </Picker>
-
-          <Button title="Apply Filters" onPress={handleApplyFilters} />
-          <Button title="Cancel" onPress={onClose} color="red" />
+          <View style={styles.buttonContainer}>
+            <Button title="Apply Filters" onPress={handleApplyFilters} />
+            <Button title="Cancel" onPress={onClose} />
+          </View>
         </View>
       </View>
     </Modal>
@@ -119,6 +120,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     marginBottom: 15,
+  },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    width: '100%',
   },
 });
 
