@@ -57,6 +57,7 @@ const UserScreen: React.FC = () => {
       const response = await addUser(newUser);
       console.log(response)
       setUsers((prev) => [response,...prev, ]);
+      console.log(response,'response')
       Toast.show({ type: 'success', text1: 'User added successfully!' });
     } catch (error) {
       Toast.show({ type: 'error', text1: 'Error adding user' });

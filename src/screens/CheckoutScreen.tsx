@@ -21,15 +21,13 @@ const CheckoutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     },
     validationSchema,
     onSubmit: (values) => {
-      // Handle checkout logic here
-      console.log('Checkout values:', values);
       Toast.show({
         type: 'success',
         position: 'bottom',
         text1: 'Checkout Successful',
         text2: 'Thank you for your purchase!',
       });
-      navigation.replace('ProductList'); // Navigate to another screen after successful checkout
+      navigation.replace('ProductList'); 
     },
   });
 
@@ -63,8 +61,12 @@ const CheckoutScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
-    flex: 1,
+    display:'flex',
+    alignItems:'center',
+    justifyContent:'center',
+    width:'100%',
+    height:'100%',
+    paddingHorizontal:20
   },
 });
 

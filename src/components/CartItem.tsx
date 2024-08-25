@@ -1,23 +1,24 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
-import { CartItem as CartItemType } from '../types'; 
+import { Product } from '../types';
+import Button from './Button';
 
 interface CartItemProps {
-  item: CartItemType;
-  onRemove: () => void; 
+  product: Product;
+  quantity: number;
+  onRemove: () => void;
 }
 
-const CartItem: React.FC<CartItemProps> = ({ item, onRemove }) => {
+const CartItem: React.FC<CartItemProps> = ({ product, quantity, onRemove }) => {
+  // if (!product || !product.price || !product.title || !product.image) {
+  //   return null; 
+  // }
+
   return (
     <View style={styles.container}>
-      <Image source={{ uri: item?.product?.image }} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.title}>{item?.product.title}</Text>
-        <Text style={styles.price}>${item?.product.price.toFixed(2)}</Text>
-        <Text style={styles.quantity}>Quantity: {item.quantity}</Text>
-        <TouchableOpacity style={styles.removeButton} onPress={onRemove}>
-          <Text style={styles.removeButtonText}>Remove</Text>
-        </TouchableOpacity>
+        <Text style={styles.quantity}>Quantity: {quantity}</Text>
+        <Button title='Remove' onPress={onRemove}/>
       </View>
     </View>
   );
@@ -39,6 +40,10 @@ const styles = StyleSheet.create({
   info: {
     marginLeft: 10,
     flex: 1,
+    display:'flex',
+    flexDirection:'row',
+    justifyContent:'space-between',
+    alignItems:'center'
   },
   title: {
     fontSize: 16,

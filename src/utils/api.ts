@@ -202,7 +202,7 @@ export const fetchUserCart = async (userId: number) => {
   }
 };
 
-export const addCart = async (cartItem: CartItem) => {
+export const addCart = async (cartItem: any) => {
   try {
     const response = await fetch(`${API_BASE_URL}/carts`, {
       method: 'POST',
